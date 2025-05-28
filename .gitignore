@@ -5,8 +5,7 @@
 __pycache__/
 
 # Ruby
-*.gem
-!gemspec/*.gem
+gems/
 .bundle/
 vendor/bundle/
 .rbenv-vars
