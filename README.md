@@ -1,10 +1,10 @@
 # NitPicker
 
-NitPicker is a command-line tool that provides AI-powered code reviews for your Git changes. It analyzes your staged changes and offers constructive feedback to help improve code quality, security, performance, and maintainability.
+NitPicker is a command-line tool that provides AI-powered code reviews for your Git changes. It analyzes your staged changes by default, but can also review any diff piped to it. It offers constructive feedback to help improve code quality, security, performance, and maintainability.
 
 ## Features
 
-- AI-powered code review of staged Git changes
+- AI-powered code review of staged Git changes or any piped diff
 - Comprehensive analysis covering code quality, security, performance, and best practices
 - Customizable AI prompts for tailored review feedback
 - Support for repository-specific prompts
@@ -100,10 +100,22 @@ The special string `{{DIFF}}` in your prompt will be replaced with the current g
 
 ## Usage
 
+### Review Staged Changes (Default)
+
 Navigate to your Git repository, stage your changes, and run:
 
 ```bash
 nitpicker [options]
+```
+
+### Review Any Diff via Pipe
+
+You can pipe any diff into nitpicker for review:
+
+```bash
+git show | nitpicker              # Review a specific commit
+git diff HEAD~1 | nitpicker       # Review changes from previous commit
+git diff main..feature | nitpicker # Review differences between branches
 ```
 
 Options:
@@ -112,12 +124,31 @@ Options:
 
 ## Examples
 
+### Review Staged Changes
 ```bash
 # Stage some changes first
 git add .
 
 # Get AI code review of staged changes
 nitpicker
+```
+
+### Review Specific Commits or Diffs
+```bash
+# Review the last commit
+git show | nitpicker
+
+# Review changes from 2 commits ago
+git show HEAD~2 | nitpicker
+
+# Review uncommitted changes (both staged and unstaged)
+git diff HEAD | nitpicker
+
+# Review differences between branches
+git diff main..feature-branch | nitpicker
+
+# Review a range of commits
+git diff HEAD~3..HEAD | nitpicker
 ```
 
 Example output:

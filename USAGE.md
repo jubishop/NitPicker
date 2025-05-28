@@ -12,21 +12,28 @@
    cd your-project
    ```
 
-3. **Stage some changes**:
+3. **Review staged changes** (default):
    ```bash
    git add .
    # or stage specific files
    git add src/main.rb
+   
+   # Run NitPicker
+   nitpicker
    ```
 
-4. **Run NitPicker**:
+4. **Or review any diff via pipe**:
    ```bash
-   nitpicker
+   # Review a specific commit
+   git show | nitpicker
+   
+   # Review changes from previous commit
+   git diff HEAD~1 | nitpicker
    ```
 
 ## Basic Examples
 
-### Example 1: Simple Code Review
+### Example 1: Simple Code Review (Staged Changes)
 
 ```bash
 # Make some changes to your code
@@ -68,7 +75,47 @@ end
 This would make the method more testable and follow Ruby conventions better.
 ```
 
-### Example 2: Using Custom Model
+### Example 2: Review via Piped Diff
+
+```bash
+# Review the last commit you made
+git show | nitpicker
+
+# Review changes between two commits
+git diff HEAD~2..HEAD | nitpicker
+
+# Review uncommitted changes (staged and unstaged)
+git diff HEAD | nitpicker
+
+# Review differences between branches
+git diff main..feature-branch | nitpicker
+```
+
+**Example Output**:
+```
+## Code Review Summary
+
+**Overall Assessment:** These changes introduce a new feature with good structure, but there are some areas for improvement.
+
+### Positive Aspects:
+- Well-organized code structure
+- Good separation of concerns
+- Comprehensive test coverage
+
+### Suggestions for Improvement:
+
+**Performance:**
+- Consider caching the database query result on line 45 to avoid repeated calls
+- The loop on line 67 could be optimized using a more efficient algorithm
+
+**Security:**
+- Input validation should be added for user-provided parameters
+- Consider using parameterized queries to prevent SQL injection
+
+This review covers 156 lines of changes across 4 files.
+```
+
+### Example 3: Using Custom Model
 
 ```bash
 # Set a different AI model
@@ -77,9 +124,12 @@ export GIT_REVIEW_MODEL="openai/gpt-4o"
 # Stage your changes and review
 git add .
 nitpicker
+
+# Or pipe any diff with custom model
+git show HEAD~1 | nitpicker
 ```
 
-### Example 3: Repository-Specific Prompt
+### Example 4: Repository-Specific Prompt
 
 ```bash
 # Create a custom prompt for this repository
@@ -161,6 +211,19 @@ if command -v nitpicker &> /dev/null; then
 fi
 ```
 
+### Post-commit Hook
+
+Create `.git/hooks/post-commit`:
+```bash
+#!/bin/bash
+# Review the commit that was just made
+
+if command -v nitpicker &> /dev/null; then
+    echo "Reviewing the commit you just made..."
+    git show | nitpicker
+fi
+```
+
 ### CI/CD Integration
 
 ```yaml
@@ -184,18 +247,15 @@ jobs:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
           git fetch origin main
-          git diff origin/main..HEAD > changes.diff
-          if [ -s changes.diff ]; then
-            # Create a temporary commit to review
-            git add -A
-            nitpicker || true  # Don't fail CI on review feedback
-          fi
+          # Review changes in the PR
+          git diff origin/main..HEAD | nitpicker || true  # Don't fail CI on review feedback
 ```
 
 ## Advanced Usage
 
 ### Multiple File Review
 
+**Using staged changes:**
 ```bash
 # Review specific types of files
 git add *.rb
@@ -206,10 +266,20 @@ git add .
 nitpicker
 ```
 
+**Using piped diffs:**
+```bash
+# Review only Ruby files in the last commit
+git show --name-only --pretty=format: HEAD | grep '\.rb$' | xargs git show HEAD -- | nitpicker
+
+# Review specific file changes
+git diff HEAD~1 -- app/models/ | nitpicker
+```
+
 ### Large Changesets
 
 For large changesets, consider reviewing in smaller chunks:
 
+**Using staged changes:**
 ```bash
 # Review database migrations separately
 git add db/migrate/*
@@ -224,6 +294,18 @@ nitpicker
 git reset
 git add spec/ test/
 nitpicker
+```
+
+**Using piped diffs:**
+```bash
+# Review database migrations from a commit
+git show HEAD -- db/migrate/ | nitpicker
+
+# Review application code changes
+git show HEAD -- app/ | nitpicker
+
+# Review test changes
+git show HEAD -- spec/ test/ | nitpicker
 ```
 
 ### Custom Prompts for Different File Types
@@ -262,12 +344,18 @@ EOF
 
 ## Troubleshooting
 
-### No Staged Changes
+### No Staged Changes or Piped Input
 ```bash
 $ nitpicker
 No changes staged for review.
 ```
-**Solution**: Stage some changes first with `git add`
+**Solution**: Stage some changes first with `git add` or pipe a diff into nitpicker
+
+```bash
+$ echo "" | nitpicker
+No diff content provided via pipe.
+```
+**Solution**: Provide a valid diff via pipe: `git show | nitpicker`
 
 ### Missing API Key
 ```bash

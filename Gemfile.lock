@@ -1,7 +1,7 @@
 PATH
   remote: gemspec
   specs:
-    nitpicker-code-review (1.0.0)
+    nitpicker-code-review (1.1)
       json (~> 2.0)
 
 GEM

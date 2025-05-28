@@ -20,7 +20,10 @@ module NitPicker
       require 'optparse'
       
       OptionParser.new do |opts|
-        opts.banner = 'Usage: nitpicker [options]'
+        opts.banner = 'Usage: nitpicker [options]
+       git show | nitpicker              # Review a specific commit
+       git diff HEAD~1 | nitpicker       # Review changes from previous commit
+       nitpicker                         # Review staged changes (default)'
         opts.version = VERSION
 
         opts.on('-h', '--help', 'Show this help message') do
@@ -33,12 +36,25 @@ module NitPicker
     def run
       parse_options
       
-      # Get git diff of staged changes
-      diff = `git diff --staged`
-      
-      if diff.empty?
-        puts "No changes staged for review."
-        exit 1
+      # Check if we have piped input
+      if STDIN.tty?
+        # Interactive terminal - use git diff of staged changes
+        diff = `git diff --staged`
+        if diff.empty?
+          puts "No changes staged for review."
+          exit 1
+        end
+      else
+        # STDIN is redirected - try to read from it
+        diff = STDIN.read
+        if diff.empty?
+          # Empty piped input, fall back to git diff
+          diff = `git diff --staged`
+          if diff.empty?
+            puts "No changes staged for review."
+            exit 1
+          end
+        end
       end
 
       # Get AI-generated code review
