@@ -8,19 +8,19 @@ Rake::TestTask.new(:test) do |t|
   t.test_files = FileList['test/**/*_test.rb']
 end
 
-desc 'Build the gem and place it in the gemspec/ folder'
+desc 'Build the gem and place it in the gems/ folder'
 task :build do
   # Build the gem
-  sh "gem build gemspec/nitpicker.gemspec"
+  sh "gem build nitpicker.gemspec"
   
   # Get the version
   version = NitPicker::VERSION
   
-  # Move the gem file to the gemspec/ folder
+  # Move the gem file to the gems/ folder
   gem_file = "nitpicker-code-review-#{version}.gem"
   if File.exist?(gem_file)
-    FileUtils.mv(gem_file, "gemspec/#{gem_file}")
-    puts "Successfully built and moved #{gem_file} to gemspec/ folder"
+    FileUtils.mv(gem_file, "gems/#{gem_file}")
+    puts "Successfully built and moved #{gem_file} to gems/ folder"
   else
     puts "Error: Could not find #{gem_file}"
   end
@@ -29,14 +29,14 @@ end
 desc 'Build, install and test the gem'
 task install: :build do
   version = NitPicker::VERSION
-  gem_file = "gemspec/nitpicker-code-review-#{version}.gem"
+  gem_file = "gems/nitpicker-code-review-#{version}.gem"
   sh "gem install #{gem_file}"
 end
 
 desc 'Build and push the gem to RubyGems'
 task push: :build do
   version = NitPicker::VERSION
-  gem_file = "gemspec/nitpicker-code-review-#{version}.gem"
+  gem_file = "gems/nitpicker-code-review-#{version}.gem"
   
   puts "Pushing nitpicker-code-review version #{version} to RubyGems..."
   begin

@@ -1,4 +1,4 @@
-require_relative '../lib/nitpicker/version'
+require_relative 'lib/nitpicker/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "nitpicker-code-review"

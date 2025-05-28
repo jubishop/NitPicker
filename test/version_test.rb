@@ -13,7 +13,7 @@ class VersionTest < Minitest::Test
   end
 
   def test_version_consistency_with_gemspec
-    gemspec_path = File.join(__dir__, '../gemspec/nitpicker.gemspec')
+    gemspec_path = File.join(__dir__, '../nitpicker.gemspec')
     gemspec_content = File.read(gemspec_path)
     
     # The gemspec should reference NitPicker::VERSION
