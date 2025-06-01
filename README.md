@@ -1,6 +1,6 @@
 # NitPicker
 
-NitPicker is a command-line tool that provides AI-powered code reviews for your Git changes. It analyzes your staged changes by default, but can also review any diff piped to it. It offers constructive feedback to help improve code quality, security, performance, and maintainability.
+NitPicker is a command-line tool that provides AI-powered code reviews for your Git changes. It analyzes your staged changes by default, but can also review any diff piped to it. It offers scathing and mercilessly critical feedback to help improve code quality, security, performance, and maintainability by making you feel like an idiot.
 
 ## Features
 
